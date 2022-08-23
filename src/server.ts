@@ -3,16 +3,19 @@ import bodyParser from "body-parser";
 import "reflect-metadata"
 import { AuthController, } from "./controlllers/AuthController";
 import { UserController } from "./controlllers/UserController";
+import { RabbitMqController } from "./controlllers/RabbitMqController";
 class Server{
    private app: express.Application;
    private authControlller: AuthController;
    private userControlller: UserController;
+   private rabbitMqController: RabbitMqController;
    
     constructor() {
         this.app = express();
         this.configuraion();
         this.authControlller = new AuthController();
         this.userControlller = new UserController();
+        this.rabbitMqController = new RabbitMqController();
      
         this.routes()        
     }
@@ -27,6 +30,7 @@ class Server{
     
         this.app.use('/api/auth',this.authControlller.router)
         this.app.use('/api/user',this.userControlller.router)
+        this.app.use('/api/rabbitmq',this.rabbitMqController.router)
         this.app.get('/ping',(req:Request,res:Response)=>{
             res.send('Pong!')
         })
