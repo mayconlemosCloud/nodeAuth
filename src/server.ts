@@ -1,47 +1,24 @@
-import express, {Request ,Response} from 'express'
-import bodyParser from "body-parser";
-import "reflect-metadata"
-import { AuthController, } from "./controlllers/AuthController";
-import { UserController } from "./controlllers/UserController";
-import { RabbitMqController } from "./controlllers/RabbitMqController";
-class Server{
-   private app: express.Application;
-   private authControlller: AuthController;
-   private userControlller: UserController;
-   private rabbitMqController: RabbitMqController;
-   
-    constructor() {
-        this.app = express();
-        this.configuraion();
-        this.authControlller = new AuthController();
-        this.userControlller = new UserController();
-        this.rabbitMqController = new RabbitMqController();
-     
-        this.routes()        
-    }
+import { AppDataSource } from './config/database';
+import { env } from './config/env';
+import { app } from './app';
 
-
-    public configuraion(){
-        this.app.set('port',process.env.PORT || 3000)
-        this.app.use(bodyParser.json())
-    }
-
-    public async routes(){        
+const start = async () => {
+  try {
+    // Database initialization is already handled in src/config/database.ts 
+    // but better to ensure it's initialized before listening if needed.
+    // In our case, the file does it on import, but we'll use the singleton here.
     
-        this.app.use('/api/auth',this.authControlller.router)
-        this.app.use('/api/user',this.userControlller.router)
-        this.app.use('/api/rabbitmq',this.rabbitMqController.router)
-        this.app.get('/ping',(req:Request,res:Response)=>{
-            res.send('Pong!')
-        })
+    if (!AppDataSource.isInitialized) {
+      await AppDataSource.initialize();
     }
 
-    public start(){
-        this.app.listen(this.app.get('port'),()=>{
-            console.log(`Server is listening ${this.app.get('port')} port.`)
-        })
-    }
-}
+    app.listen(env.PORT, () => {
+      console.log(`🚀 Server is running on http://localhost:${env.PORT}`);
+    });
+  } catch (error) {
+    console.error('❌ Error during server stool bootstrap:', error);
+    process.exit(1);
+  }
+};
 
-const server = new Server();
-server.start();
+start();

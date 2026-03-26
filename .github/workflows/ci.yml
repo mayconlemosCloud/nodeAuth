@@ -1,0 +1,55 @@
+name: CI/CD Profissional (nodeAuth)
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  lint-and-test:
+    name: 🛡️ Validação de Qualidade (Lint & Testes)
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+      - name: 📂 Checkout do Código
+        uses: actions/checkout@v4
+
+      - name: 🟢 Configurando Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: 📦 Instalando Dependências
+        run: npm ci
+
+      - name: 🔍 Verificando Estilo de Código (ESLint)
+        run: |
+          npm run lint
+          echo "### ✅ ESLint Check Passed" >> $GITHUB_STEP_SUMMARY
+
+      - name: 🧪 Executando Suíte de Testes com Cobertura
+        run: |
+          npm test -- --coverage --ci
+          echo "### ✅ Tests Passed" >> $GITHUB_STEP_SUMMARY
+          echo "A suíte de testes (Jest + Supertest) foi executada com sucesso. Verifique os logs se houver falhas." >> $GITHUB_STEP_SUMMARY
+
+      - name: 📊 Enviando Cobertura para Codecov (Opcional)
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          directory: ./coverage
+          fail_ci_if_error: false
+
+      - name: 🏆 Resumo Final da Execução
+        if: always()
+        run: |
+          echo "## 🚀 Resultado da Carga de Trabalho" >> $GITHUB_STEP_SUMMARY
+          echo "*   **Status:** ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "*   **Node Version:** ${{ matrix.node-version }}" >> $GITHUB_STEP_SUMMARY
+          echo "Projeto nodeAuth está pronto para ser enviado ao portfólio." >> $GITHUB_STEP_SUMMARY
