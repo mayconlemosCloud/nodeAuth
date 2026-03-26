@@ -100,6 +100,4 @@ npm test
 | Testes | Jest + ts-jest + Supertest |
 | CI/CD | GitHub Actions |
 
-## 📄 Licença
 
-ISC
