@@ -29,11 +29,18 @@ jobs:
         run: npm ci
 
       - name: 🔍 Verificando Estilo de Código (ESLint)
+        env:
+          JWT_SECRET: "test_secret_for_ci_lint"
+          JWT_REFRESH_SECRET: "test_refresh_secret_for_ci_lint"
         run: |
           npm run lint
           echo "### ✅ ESLint Check Passed" >> $GITHUB_STEP_SUMMARY
 
       - name: 🧪 Executando Suíte de Testes com Cobertura
+        env:
+          JWT_SECRET: "test_secret_for_ci_validation"
+          JWT_REFRESH_SECRET: "test_refresh_secret_for_ci_validation"
+          NODE_ENV: "test"
         run: |
           npm test -- --coverage --ci
           echo "### ✅ Tests Passed" >> $GITHUB_STEP_SUMMARY
