@@ -14,7 +14,7 @@
 
 ## 🎬 Demonstração
 
-![Demo](docs/demo.webp)
+![Demo](docs/demo-v2.webp)
 
 ## 📖 Sobre o Projeto
 
